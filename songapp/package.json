@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "react-scripts start",
     "dev": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview"
@@ -14,10 +15,11 @@
     "@perawallet/connect": "^1.2.1",
     "@walletconnect/client": "^1.7.4",
     "algorand-walletconnect-qrcode-modal": "^1.7.4",
-    "algosdk": "^2.1.0",
+    "algosdk": "^2.7.0",
     "buffer": "^6.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.2.0",
+    "scripts": "^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.5",
