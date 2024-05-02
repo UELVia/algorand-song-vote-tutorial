@@ -6,16 +6,11 @@ import os
 def approval_program():
     handle_creation = Seq(
         App.globalPut(Bytes("Count1"), Int(0)),
-        App.globalPut(Bytes("Count2"), Int(1)),
+        App.globalPut(Bytes("Count2"), Int(0)),
+        App.globalPut(Bytes("Count3"), Int(0)),
+        App.globalPut(Bytes("Count4"), Int(0)),
         Return(Int(1))
     )
-    # handle creation function above
-    handle_optin = Return(Int(0))
-    handle_closeout = Return(Int(0))
-    handle_updateapp = Return(Int(0))
-    handle_deleteapp = Return(Int(0))
-    # conditional statement below
-    # delete app above
 
     scratchCount = ScratchVar(TealType.uint64)
 
@@ -31,30 +26,34 @@ def approval_program():
         Return(Int(1))
     )
 
-    deduct = Seq([
-        scratchCount.store(App.globalGet(Bytes("Count"))),
-        If(scratchCount.load() > Int(0),
-           App.globalPut(Bytes("Count"), scratchCount.load() - Int(1)),
-        ),
+    addC3 = Seq(
+        scratchCount.store(App.globalGet(Bytes("Count3"))),
+        App.globalPut(Bytes("Count3"), scratchCount.load() + Int(1)),
         Return(Int(1))
-    ])
+    )
+
+    addC4 = Seq(
+        scratchCount.store(App.globalGet(Bytes("Count4"))),
+        App.globalPut(Bytes("Count4"), scratchCount.load() + Int(1)),
+        Return(Int(1))
+    )
 
     handle_noop = Seq(
-        # First, fails immediately if this transaction is grouped with others
         Assert(Global.group_size() == Int(1)),
         Cond(
             [Txn.application_args[0] == Bytes("AddC1"), addC1],
             [Txn.application_args[0] == Bytes("AddC2"), addC2],
+            [Txn.application_args[0] == Bytes("AddC3"), addC3],
+            [Txn.application_args[0] == Bytes("AddC4"), addC4],
         )
     )
 
-    # conditional below
     program = Cond(
         [Txn.application_id() == Int(0), handle_creation], 
-        [Txn.on_completion() == OnComplete.OptIn, handle_optin], 
-        [Txn.on_completion() == OnComplete.CloseOut, handle_closeout], 
-        [Txn.on_completion() == OnComplete.UpdateApplication, handle_updateapp],
-        [Txn.on_completion() == OnComplete.DeleteApplication, handle_deleteapp],
+        [Txn.on_completion() == OnComplete.OptIn, Return(Int(0))], 
+        [Txn.on_completion() == OnComplete.CloseOut, Return(Int(0))], 
+        [Txn.on_completion() == OnComplete.UpdateApplication, Return(Int(0))],
+        [Txn.on_completion() == OnComplete.DeleteApplication, Return(Int(0))],
         [Txn.on_completion() == OnComplete.NoOp, handle_noop]
     )
 
