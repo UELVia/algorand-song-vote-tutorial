@@ -7,8 +7,6 @@ def approval_program():
     handle_creation = Seq(
         App.globalPut(Bytes("Count1"), Int(0)),
         App.globalPut(Bytes("Count2"), Int(0)),
-        App.globalPut(Bytes("Count3"), Int(0)),
-        App.globalPut(Bytes("Count4"), Int(0)),
         Return(Int(1))
     )
 
@@ -26,25 +24,11 @@ def approval_program():
         Return(Int(1))
     )
 
-    addC3 = Seq(
-        scratchCount.store(App.globalGet(Bytes("Count3"))),
-        App.globalPut(Bytes("Count3"), scratchCount.load() + Int(1)),
-        Return(Int(1))
-    )
-
-    addC4 = Seq(
-        scratchCount.store(App.globalGet(Bytes("Count4"))),
-        App.globalPut(Bytes("Count4"), scratchCount.load() + Int(1)),
-        Return(Int(1))
-    )
-
     handle_noop = Seq(
         Assert(Global.group_size() == Int(1)),
         Cond(
             [Txn.application_args[0] == Bytes("AddC1"), addC1],
             [Txn.application_args[0] == Bytes("AddC2"), addC2],
-            [Txn.application_args[0] == Bytes("AddC3"), addC3],
-            [Txn.application_args[0] == Bytes("AddC4"), addC4],
         )
     )
 
